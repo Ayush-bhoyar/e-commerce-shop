@@ -3,6 +3,7 @@ import express from 'express';
 import connectDB from './config/db.js';
 import Product from './models/Product.js';
 import authRoutes from './routes/authRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 
 dotenv.config();
 
@@ -19,15 +20,17 @@ app.get('/healthz', (req, res) => res.send('ok'));
 app.use('/api/auth', authRoutes);
 
 // 🛒 Products route (fetch all)
-app.get('/api/products', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+//app.get('/api/products', async (req, res) => {
+  //try {
+   // const products = await Product.find();
+    //res.json(products);
+ // } catch (err) {
+   // console.error(err);
+   // res.status(500).json({ error: 'Internal server error' });
+ // }
+//});
+// 🛒 Product routes (Step 3.7 — Protected)
+app.use('/api/products', productRoutes);
 
 // Root
 app.get('/', (req, res) =>

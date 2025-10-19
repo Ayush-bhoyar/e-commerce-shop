@@ -1,7 +1,10 @@
-require('dotenv').config();
-const express = require('express');
-const connectDB = require('./config/db');
-const Product = require('./models/Product');
+import dotenv from 'dotenv';
+import express from 'express';
+import connectDB from './config/db.js';
+import Product from './models/Product.js';
+import authRoutes from './routes/authRoutes.js';
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -12,7 +15,10 @@ connectDB();
 // Health check
 app.get('/healthz', (req, res) => res.send('ok'));
 
-// Products route (fetch all)
+// 🔐 Auth routes (Step 3.5)
+app.use('/api/auth', authRoutes);
+
+// 🛒 Products route (fetch all)
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find();
@@ -24,7 +30,9 @@ app.get('/api/products', async (req, res) => {
 });
 
 // Root
-app.get('/', (req, res) => res.send('ShopSmart Backend Running with MongoDB...'));
+app.get('/', (req, res) =>
+  res.send('ShopSmart Backend Running with MongoDB...')
+);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`✅ Server running on port ${port}`));

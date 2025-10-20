@@ -1,29 +1,32 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const Product = require('./models/Product');
+import dotenv from 'dotenv';
+dotenv.config();
+
+import connectDB from './config/db.js';
+import Product from './models/Product.js';
+import redisClient from './config/redisClient.js'; // Redis import
 
 const products = [
-  { name: 'T-Shirt', price: 20.0, image: '/images/tshirt.png' },
+  { name: 'T-Shirt', price: 20, image: '/images/tshirt.png' },
   { name: 'Headphones', price: 59.99, image: '/images/headphones.png' },
   { name: 'Sneakers', price: 79.99, image: '/images/sneakers.png' },
 ];
 
-async function seed() {
+const importData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
+    await connectDB();
     await Product.deleteMany();
     await Product.insertMany(products);
-    console.log('✅ Sample products inserted');
-    process.exit(0);
+    console.log('✅ Data Imported!');
+
+    // Clear Redis cache after seeding
+    await redisClient.del('products');
+    console.log('🧹 Redis cache cleared');
+
+    process.exit();
   } catch (error) {
-    console.error('❌ Seeding failed:', error);
+    console.error('❌ Error with data import:', error);
     process.exit(1);
   }
-}
+};
 
-seed();
-
+importData();

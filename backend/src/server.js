@@ -1,36 +1,26 @@
 import dotenv from 'dotenv';
+dotenv.config();  // Must be first
+
 import express from 'express';
 import connectDB from './config/db.js';
-import Product from './models/Product.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
-
-dotenv.config();
+import paymentRoutes from './routes/paymentRoutes.js';
+import redisClient from './config/redisClient.js';
 
 const app = express();
 app.use(express.json());
 
-// Connect to MongoDB
+// Connect MongoDB
 connectDB();
 
 // Health check
 app.get('/healthz', (req, res) => res.send('ok'));
 
-// 🔐 Auth routes (Step 3.5)
+// Routes
 app.use('/api/auth', authRoutes);
-
-// 🛒 Products route (fetch all)
-//app.get('/api/products', async (req, res) => {
-  //try {
-   // const products = await Product.find();
-    //res.json(products);
- // } catch (err) {
-   // console.error(err);
-   // res.status(500).json({ error: 'Internal server error' });
- // }
-//});
-// 🛒 Product routes (Step 3.7 — Protected)
 app.use('/api/products', productRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Root
 app.get('/', (req, res) =>
@@ -39,4 +29,3 @@ app.get('/', (req, res) =>
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`✅ Server running on port ${port}`));
-
